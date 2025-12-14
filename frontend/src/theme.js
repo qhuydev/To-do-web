@@ -18,6 +18,7 @@ const theme = createTheme({
     columnFooterHeight: COLUMN_FOOTER_HEIGHT,
   },
 
+
   // ⚡ Color schemes
   colorSchemes: {
     light: {},

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import AppBar from '~/components/AppBar/AppBar'
 import Container from '@mui/material/Container'
@@ -10,17 +10,24 @@ import BoardContent from './BoardContent/BoardContent'
 import BottomNav from '../../components/AppBar/BottomNav/BottomNav'
 import { useBoardStore } from '~/stores'
 import { useSnackbar } from 'notistack'
-
+import MyTask from '../navitems/MyTask.jsx'
+import Drawer from '@mui/material/Drawer'
+import Inbox from '../navitems/Inbox.jsx'
+import IdeasPage from '../navitems/IdeasPage.jsx'
 function Board() {
+  const [isInboxOpen, setIsInboxOpen] = useState(false)
+  const [isIdeaOpen, setIsIdeaOpen] = useState(false)
+
+
   const { boardId } = useParams()
   const { currentBoard, isLoading, fetchBoardById, clearCurrentBoard } = useBoardStore()
   const { enqueueSnackbar } = useSnackbar()
+  const [contentView, setContentView] = useState("board")
 
-  // Helper thống nhất để show snackbar
   const showSnackbar = (message, variant = 'success') => {
-    enqueueSnackbar(message, { 
+    enqueueSnackbar(message, {
       variant,
-      anchorOrigin: { vertical: 'bottom', horizontal: 'left' }, // luôn hiển thị top-right
+      anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
       autoHideDuration: 3000,
     })
   }
@@ -32,9 +39,8 @@ function Board() {
       })
     }
     return () => clearCurrentBoard()
-  }, [boardId, fetchBoardById, clearCurrentBoard])
+  }, [boardId])
 
-  // Loading state
   if (isLoading || !currentBoard) {
     return (
       <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
@@ -55,14 +61,51 @@ function Board() {
     )
   }
 
-  // Main content
   return (
-    <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
-      <AppBar board={currentBoard}  />
-      <BoardBar board={currentBoard} showSnackbar={showSnackbar} />
+    <Container
+  disableGutters
+  maxWidth={false}
+  sx={{ height: '100vh', overflow: 'hidden' }}
+>
+  <AppBar board={currentBoard} />
+  <BoardBar board={currentBoard} showSnackbar={showSnackbar} />
+
+  {/* Giữ layout cũ */}
+  <Box >
+    {contentView === "board" && (
       <BoardContent board={currentBoard} showSnackbar={showSnackbar} />
-      <BottomNav board={currentBoard} showSnackbar={showSnackbar} />
-    </Container>
+    )}
+
+    {contentView === "tasks" && (
+      <MyTask board={currentBoard} />
+    )}
+  </Box>
+
+  <BottomNav
+    board={currentBoard}
+    showBoard={() => setContentView("board")}
+    showTasks={() => setContentView("tasks")}
+    openInbox={() => setIsInboxOpen(true)}
+    openIdeas={() => setIsIdeaOpen(true)}
+  />
+
+  <Drawer
+    anchor="left"
+    open={isInboxOpen}
+    onClose={() => setIsInboxOpen(false)}
+  >
+    <Inbox />
+
+  </Drawer>
+    <Drawer
+    anchor="left"
+    open={isIdeaOpen}
+    onClose={() => setIsIdeaOpen(false)}
+  >
+    <IdeasPage />
+  </Drawer>
+</Container>
+
   )
 }
 

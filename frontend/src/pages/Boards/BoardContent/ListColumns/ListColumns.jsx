@@ -50,6 +50,7 @@ function ListColumns({ board, showSnackbar }) {
         overflowX: 'auto',
         overflowY: 'hidden',
         '&::-webkit-scrollbar-track': { m: 2 },
+        
         p: 1,
       }}>
         {lists.map((list) => (

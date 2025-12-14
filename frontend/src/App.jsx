@@ -4,7 +4,8 @@ import BoardList from './pages/BoardList'
 import Board from './pages/Boards/Board'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import { useAuthStore } from './stores'
-
+import IdeasPage from './pages/navitems/IdeasPage'
+import MyTasks from './pages/navitems/MyTask'
 function App() {
   const { isAuthenticated } = useAuthStore()
 
@@ -36,6 +37,9 @@ function App() {
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/ideas" element={<IdeasPage />} />
+        <Route path="/switch" element={<MyTasks />} />
+
       </Routes>
     </BrowserRouter>
   )
