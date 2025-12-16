@@ -19,11 +19,20 @@ import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import ModeSelect from "~/components/ModeSelect/ModeSelect";
 import Profiles from "./Menus/Profiles";
-function AppBar( { board } ) {
+
+import MenuIcon from "@mui/icons-material/Menu";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+
+function AppBar({ board }) {
   const navigate = useNavigate();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-
   const [searchValue, setSearchValue] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
+  const handleMobileSearchToggle = () => setMobileSearchOpen(!mobileSearchOpen);
 
   return (
     <Box
@@ -59,36 +68,98 @@ function AppBar( { board } ) {
         <Typography
           component="span"
           variant="h6"
-          sx={{ fontWeight: "bold", color: "white" }}
+          sx={{
+            fontWeight: "bold",
+            color: "white",
+            whiteSpace: "nowrap", // ← không xuống dòng
+            overflow: "hidden", // ← ẩn phần tràn
+            textOverflow: "ellipsis",
+          }}
           onClick={() => navigate("/")}
         >
           To-do List
         </Typography>
-        <Workspace />
-        <Recent />
-        <Starred />
-        <Templates />
-        <Button
-          variant="outlined"
-          startIcon={<LibraryAddIcon />}
-          sx={{
-            color: "white",
-            borderColor: "white",
-            "&:hover": { borderColor: "white" },
-          }}
-          onClick={() => navigate("/")}
+
+        {/* Menu desktop */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
+          <Workspace />
+          <Recent />
+          <Starred />
+          <Templates />
+          <Button
+            variant="outlined"
+            startIcon={<LibraryAddIcon />}
+            sx={{
+              color: "white",
+              borderColor: "white",
+              "&:hover": { borderColor: "white" },
+            }}
+            onClick={() => navigate("/")}
+          >
+            Create
+          </Button>
+        </Box>
+
+        {/* Menu mobile */}
+        <IconButton
+          sx={{ display: { xs: "flex", md: "none" }, color: "white" }}
+          onClick={handleDrawerToggle}
         >
-          Create
-        </Button>
+          <MenuIcon />
+        </IconButton>
+        <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
+          <Box
+            sx={{
+              width: 250,
+              height: "100%",
+              p: 2,
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "#2f3542"
+                  : board?.background || "#3742fa",
+              color: "white",
+            }}
+            role="presentation"
+          >
+            <Workspace />
+            <Recent />
+            <Starred />
+            <Templates />
+            <Button
+              startIcon={<LibraryAddIcon />}
+              sx={{
+                mt: 1,
+                color: "white",
+                borderColor: "white",
+                "&:hover": { borderColor: "white" },
+              }}
+              onClick={() => navigate("/")}
+            >
+              Create
+            </Button>
+          </Box>
+        </Drawer>
       </Box>
 
       {/* Bên trái AppBar */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {/* Search desktop */}
         <TextField
-          id="outlined-basic"
-          label="Search"
-          type="text"
+          sx={{
+            display: { xs: "none", sm: "flex" },
+            minWidth: 120,
+            maxWidth: 170,
+            "& label": { color: "white" },
+            "& input": { color: "white" },
+            "& label.Mui-focused": { color: "white" },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": { borderColor: "white" },
+              "&:hover fieldset": { borderColor: "white" },
+              "&.Mui-focused fieldset": { borderColor: "white" },
+            },
+          }}
           size="small"
+          label="Search"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           InputProps={{
@@ -107,34 +178,66 @@ function AppBar( { board } ) {
                 onClick={() => setSearchValue("")}
               />
             ),
-            style: { color: "white" },
-          }}
-          sx={{
-            minWidth: 120,
-            maxWidth: 170,
-            "& label": { color: "white" },
-            "& input": { color: "white" },
-            "& label.Mui-focused": { color: "white" },
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": { borderColor: "white" },
-              "&:hover fieldset": { borderColor: "white" },
-              "&.Mui-focused fieldset": { borderColor: "white" },
-            },
           }}
         />
-        {/* Đổi màu giao diện */}
+
+        {/* Search mobile icon */}
+        <IconButton
+          sx={{ display: { xs: "flex", sm: "none" }, color: "white" }}
+          onClick={handleMobileSearchToggle}
+        >
+          <SearchIcon />
+        </IconButton>
+
+        {/* Mobile search drawer */}
+        <Drawer
+          anchor="top"
+          open={mobileSearchOpen}
+          onClose={handleMobileSearchToggle}
+        >
+          <Box sx={{ p: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <CloseIcon
+                    fontSize="small"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSearchValue("");
+                      setMobileSearchOpen(false);
+                    }}
+                  />
+                ),
+              }}
+            />
+          </Box>
+        </Drawer>
+
+        {/* Mode select */}
         <ModeSelect />
-        {/* Notification */}
+
+        {/* Notifications */}
         <Tooltip title="Notifications">
           <Badge color="warning" variant="dot" sx={{ cursor: "pointer" }}>
             <NotificationsNoneIcon sx={{ color: "white" }} />
           </Badge>
         </Tooltip>
 
-        {/* Trợ giúp */}
+        {/* Help */}
         <Tooltip title="Help">
           <HelpOutlineIcon sx={{ cursor: "pointer", color: "white" }} />
         </Tooltip>
+
         {/* Profiles */}
         <Profiles />
       </Box>

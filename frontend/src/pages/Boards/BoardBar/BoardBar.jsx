@@ -11,6 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import AvatarGroup from "@mui/material/AvatarGroup";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LeaderboardOutlinedIcon from "@mui/icons-material/LeaderboardOutlined";
@@ -28,11 +29,20 @@ function BoardBar({ board }) {
 
   const [isStarred, setIsStarred] = useState(board?.isStarred || false);
   const [menuBoard, setMenuBoard] = useState(null);
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState(null);
 
   const openBoard = Boolean(menuBoard);
 
   const handleToggleStar = () => {
     setIsStarred((prev) => !prev);
+  };
+
+  const handleMobileMenuOpen = (event) => {
+    setMobileMenuAnchor(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchor(null);
   };
 
   return (
@@ -49,10 +59,11 @@ function BoardBar({ board }) {
             ? "#2f3542"
             : board?.background || "#3742fa",
         borderBottom: "1px solid rgba(255,255,255,0.3)",
+        flexWrap: "nowrap",
       }}
     >
       {/* ===== LEFT ===== */}
-      <Box display="flex" alignItems="center" gap={1}>
+      <Box display="flex" alignItems="center" gap={1} flexWrap="nowrap">
         <Tooltip title="Back to boards">
           <IconButton
             size="small"
@@ -65,6 +76,7 @@ function BoardBar({ board }) {
             <ArrowBackIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Tooltip>
+
         {/* BOARD TITLE */}
         <Typography
           variant="h6"
@@ -72,6 +84,9 @@ function BoardBar({ board }) {
             color: "white",
             fontWeight: 600,
             fontSize: "1rem",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
           {board?.title || "Untitled Board"}
@@ -95,9 +110,13 @@ function BoardBar({ board }) {
           startIcon={<LeaderboardOutlinedIcon />}
           endIcon={<ExpandMoreIcon />}
           onClick={(e) => setMenuBoard(e.currentTarget)}
-          sx={{ color: "white", textTransform: "none" }}
+          sx={{
+            color: "white",
+            textTransform: "none",
+            gap: { xs: 0, sm: 1 },
+          }}
         >
-          Board
+          <Typography sx={{ display: { xs: "none", sm: "block" } }}>Board</Typography>
         </Button>
 
         <Menu
@@ -161,11 +180,12 @@ function BoardBar({ board }) {
           </Box>
         </Menu>
       </Box>
-      {/* RIGHT */}{" "}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        {" "}
+
+      {/* ===== RIGHT ===== */}
+      <Box display="flex" alignItems="center" gap={1}>
+        {/* Desktop: AvatarGroup */}
         <AvatarGroup
-          max={3}
+          max={3} // Desktop hiển thị 3, mobile gom vào More
           sx={{
             gap: "10px",
             "& .MuiAvatar-root": {
@@ -175,50 +195,102 @@ function BoardBar({ board }) {
               border: "none",
               color: "white",
               cursor: "pointer",
-              "&:first-of-type": { bgcolor: "#a4b500" },
             },
           }}
         >
-          {" "}
-          {/* Ví dụ: Danh sách user — có thể thay sau bằng dữ liệu động */}{" "}
           {[...Array(5)].map((_, i) => (
-            <Tooltip key={i} title="Huy">
-              {" "}
+            <Tooltip key={i} title={`User ${i + 1}`}>
               <Avatar
                 alt="User avatar"
                 src="https://avatars.githubusercontent.com/u/154976155?s=400&u=583d70f122d468a758f46896c349b38e886f6a2f&v=4"
-              />{" "}
+              />
             </Tooltip>
-          ))}{" "}
-        </AvatarGroup>{" "}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          {" "}
+          ))}
+        </AvatarGroup>
+
+        {/* Desktop icons */}
+        <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", gap: 1 }}>
           <IconButton sx={{ color: "white" }}>
-            {" "}
-            <StarBorderIcon />{" "}
-          </IconButton>{" "}
+            <StarBorderIcon />
+          </IconButton>
           <IconButton sx={{ color: "white" }}>
-            {" "}
-            <PeopleOutlineIcon />{" "}
-          </IconButton>{" "}
-        </Box>{" "}
+            <PeopleOutlineIcon />
+          </IconButton>
+        </Box>
+
+        {/* Share button */}
         <Button
           variant="outlined"
           size="small"
           startIcon={<PersonAddIcon />}
           sx={{
+            display: { xs: "none", sm: "inline-flex" },
             color: "white",
             borderColor: "white",
             "&:hover": { borderColor: "white" },
           }}
         >
-          {" "}
-          Share{" "}
-        </Button>{" "}
-        <IconButton sx={{ color: "white" }}>
-          {" "}
-          <MoreHorizIcon />{" "}
-        </IconButton>{" "}
+          Share
+        </Button>
+
+        {/* Mobile: More menu */}
+        <IconButton
+          sx={{ color: "white", display: { sm: "none" } }}
+          onClick={handleMobileMenuOpen}
+        >
+          <MoreHorizIcon />
+        </IconButton>
+
+        <Menu
+          anchorEl={mobileMenuAnchor}
+          open={Boolean(mobileMenuAnchor)}
+          onClose={handleMobileMenuClose}
+          PaperProps={{ sx: { width: 200 } }}
+        >
+          <MenuItem>
+            <AvatarGroup
+              max={5}
+              sx={{
+                "& .MuiAvatar-root": { width: 30, height: 30, fontSize: 14 },
+                mr: 1,
+              }}
+            >
+              {[...Array(5)].map((_, i) => (
+                <Avatar
+                  key={i}
+                  alt={`User ${i + 1}`}
+                  src="https://avatars.githubusercontent.com/u/154976155?s=400&u=583d70f122d468a758f46896c349b38e886f6a2f&v=4"
+                />
+              ))}
+            </AvatarGroup>
+            Members
+          </MenuItem>
+
+          <MenuItem>
+            <IconButton sx={{ color: "inherit", mr: 1 }}>
+              <StarBorderIcon />
+            </IconButton>
+            Star
+          </MenuItem>
+
+          <MenuItem>
+            <IconButton sx={{ color: "inherit", mr: 1 }}>
+              <PeopleOutlineIcon />
+            </IconButton>
+            Members
+          </MenuItem>
+
+          <MenuItem>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<PersonAddIcon />}
+              sx={{ color: "black", borderColor: "gray", "&:hover": { borderColor: "gray" } }}
+            >
+              Share
+            </Button>
+          </MenuItem>
+        </Menu>
       </Box>
     </Box>
   );

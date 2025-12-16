@@ -157,7 +157,7 @@ export default function MyTasks({ board }) {
               <TableRow>
                 <TableCell width={40} />
                 <TableCell>Task</TableCell>
-                <TableCell>Priority</TableCell>
+                <TableCell >Priority</TableCell>
 
                 <TableCell>Status</TableCell>
 
@@ -192,7 +192,7 @@ export default function MyTasks({ board }) {
                     <Checkbox size="small" />
                   </TableCell>
 
-                  <TableCell>{task.title}</TableCell>
+                  <TableCell sx={{ fontWeight: 500, fontSize: 14 }}>{task.title}</TableCell>
 
                   <TableCell
                     sx={{
