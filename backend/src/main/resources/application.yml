@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: todo-backend
+
+  data:
+    mongodb:
+      uri: mongodb+srv://quanghuydev:HfXXGdMRBmOdjTVh@cluster0.itmveh7.mongodb.net/todoapp?retryWrites=true&w=majority&appName=Cluster0
+
+server:
+  port: 8017
+
+jwt:
+  secret: ${JWT_SECRET:bXlTZWNyZXRLZXlGb3JKV1RUb2tlbkdlbmVyYXRpb25NdXN0QmVBdExlYXN0MjU2Qml0c0xvbmcxMjM0NTY3ODk=}
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:3000,http://192.168.1.23:5173,http://172.16.35.39:5173
